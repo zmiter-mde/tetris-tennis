@@ -12,6 +12,7 @@
         var vm = this;
 
         vm.start = start;
+        vm.changeDirection = changeDirection;
 
         fieldService.init();
         vm.field = fieldService.fieldModel.field;
@@ -19,6 +20,10 @@
 
         function start() {
             fieldService.start();
+        }
+
+        function changeDirection() {
+
         }
 
         function outputField() {

@@ -44,10 +44,13 @@
                     moveTopRight();
                     break;
                 case C.DIRECTIONS.TOP_LEFT:
+                    moveTopLeft();
                     break;
                 case C.DIRECTIONS.BOTTOM_LEFT:
+                    moveBottomLeft();
                     break;
                 case C.DIRECTIONS.BOTTOM_RIGHT:
+                    moveBottomRight();
                     break;
                 default:
                     console.log('Unknown direction');
@@ -59,11 +62,10 @@
             var field = vm.fieldModel.field;
             var pos = vm.ballPos;
             if (pos.top == C.BORDERS.TOP_BORDER || field[pos.top - 1][pos.left].val == C.CELL_STATES.CELL) {
+                deleteCells(C.DIRECTIONS.TOP_RIGHT, true);
                 if (pos.left == C.BORDERS.RIGHT_BORDER || field[pos.top][pos.left + 1].val == C.CELL_STATES.CELL) {
-                    deleteCells(C.DIRECTIONS.TOP_RIGHT, true);
                     vm.direction = C.DIRECTIONS.BOTTOM_LEFT;
                 } else {
-                    deleteCells(C.DIRECTIONS.TOP_RIGHT, true);
                     vm.direction = C.DIRECTIONS.BOTTOM_RIGHT;
                 }
             } else {
@@ -76,6 +78,81 @@
                         vm.direction = C.DIRECTIONS.BOTTOM_LEFT;
                     } else {
                         moveBall(C.DIRECTIONS.TOP_RIGHT);
+                    }
+                }
+            }
+        }
+
+        function moveTopLeft() {
+            var field = vm.fieldModel.field;
+            var pos = vm.ballPos;
+            if (pos.top == C.BORDERS.TOP_BORDER || field[pos.top - 1][pos.left].val == C.CELL_STATES.CELL) {
+                deleteCells(C.DIRECTIONS.TOP_LEFT, true);
+                if (pos.left == C.BORDERS.LEFT_BORDER || field[pos.top][pos.left - 1].val == C.CELL_STATES.CELL) {
+                    vm.direction = C.DIRECTIONS.BOTTOM_RIGHT;
+                } else {
+                    vm.direction = C.DIRECTIONS.BOTTOM_LEFT;
+                }
+            } else {
+                if (pos.left == C.BORDERS.LEFT_BORDER || field[pos.top][pos.left - 1].val == C.CELL_STATES.CELL) {
+                    deleteCells(C.DIRECTIONS.TOP_LEFT, true);
+                    vm.direction = C.DIRECTIONS.TOP_RIGHT;
+                } else {
+                    if (field[pos.top - 1][pos.left - 1] == C.CELL_STATES.CELL) {
+                        deleteCells(C.DIRECTIONS.TOP_LEFT, false);
+                        vm.direction = C.DIRECTIONS.BOTTOM_RIGHT;
+                    } else {
+                        moveBall(C.DIRECTIONS.TOP_LEFT);
+                    }
+                }
+            }
+        }
+
+        function moveBottomLeft() {
+            var field = vm.fieldModel.field;
+            var pos = vm.ballPos;
+            if (field[pos.top + 1][pos.left].val == C.CELL_STATES.CELL) {
+                deleteCells(C.DIRECTIONS.TOP_LEFT, true);
+                if (pos.left == C.BORDERS.LEFT_BORDER || field[pos.top][pos.left - 1].val == C.CELL_STATES.CELL) {
+                    vm.direction = C.DIRECTIONS.TOP_RIGHT;
+                } else {
+                    vm.direction = C.DIRECTIONS.TOP_LEFT;
+                }
+            } else {
+                if (pos.left == C.BORDERS.LEFT_BORDER || field[pos.top][pos.left - 1].val == C.CELL_STATES.CELL) {
+                    deleteCells(C.DIRECTIONS.TOP_LEFT, true);
+                    vm.direction = C.DIRECTIONS.BOTTOM_RIGHT;
+                } else {
+                    if (field[pos.top + 1][pos.left - 1] == C.CELL_STATES.CELL) {
+                        deleteCells(C.DIRECTIONS.BOTTOM_LEFT, false);
+                        vm.direction = C.DIRECTIONS.TOP_RIGHT;
+                    } else {
+                        moveBall(C.DIRECTIONS.BOTTOM_LEFT);
+                    }
+                }
+            }
+        }
+
+        function moveBottomRight() {
+            var field = vm.fieldModel.field;
+            var pos = vm.ballPos;
+            if (field[pos.top + 1][pos.left].val == C.CELL_STATES.CELL) {
+                deleteCells(C.DIRECTIONS.BOTTOM_RIGHT, true);
+                if (pos.left == C.BORDERS.RIGHT_BORDER || field[pos.top][pos.left + 1].val == C.CELL_STATES.CELL) {
+                    vm.direction = C.DIRECTIONS.TOP_LEFT;
+                } else {
+                    vm.direction = C.DIRECTIONS.TOP_RIGHT;
+                }
+            } else {
+                if (pos.left == C.BORDERS.RIGHT_BORDER || field[pos.top][pos.left + 1].val == C.CELL_STATES.CELL) {
+                    deleteCells(C.DIRECTIONS.BOTTOM_RIGHT, true);
+                    vm.direction = C.DIRECTIONS.BOTTOM_LEFT;
+                } else {
+                    if (field[pos.top + 1][pos.left + 1] == C.CELL_STATES.CELL) {
+                        deleteCells(C.DIRECTIONS.BOTTOM_RIGHT, false);
+                        vm.direction = C.DIRECTIONS.TOP_LEFT;
+                    } else {
+                        moveBall(C.DIRECTIONS.BOTTOM_RIGHT);
                     }
                 }
             }
@@ -181,7 +258,8 @@
         }
 
         function deleteBottom() {
-            if (vm.ballPos.top < C.BORDERS.BOTTOM_BORDER) {
+            if (vm.ballPos.top < C.BORDERS.BOTTOM_BORDER &&
+                vm.fieldModel.field[vm.ballPos.top + 1][vm.ballPos.left].val == C.CELL_STATES.CELL) {
                 vm.fieldModel.field[vm.ballPos.top + 1][vm.ballPos.left].val = C.CELL_STATES.EMPTY;
             }
         }
@@ -205,13 +283,17 @@
         }
 
         function deleteBottomLeft() {
-            if (vm.ballPos.left > C.BORDERS.LEFT_BORDER && vm.ballPos.top < C.BORDERS.BOTTOM_BORDER) {
+            if (vm.ballPos.left > C.BORDERS.LEFT_BORDER &&
+                vm.ballPos.top < C.BORDERS.BOTTOM_BORDER &&
+                vm.fieldModel.field[vm.ballPos.top + 1][vm.ballPos.left - 1].val == C.CELL_STATES.CELL) {
                 vm.fieldModel.field[vm.ballPos.top + 1][vm.ballPos.left - 1].val = C.CELL_STATES.EMPTY;
             }
         }
 
         function deleteBottomRight() {
-            if (vm.ballPos.left < C.BORDERS.RIGHT_BORDER && vm.ballPos.top < C.BORDERS.BOTTOM_BORDER) {
+            if (vm.ballPos.left < C.BORDERS.RIGHT_BORDER &&
+                vm.ballPos.top < C.BORDERS.BOTTOM_BORDER &&
+                vm.fieldModel.field[vm.ballPos.top + 1][vm.ballPos.left + 1].val == C.CELL_STATES.CELL) {
                 vm.fieldModel.field[vm.ballPos.top + 1][vm.ballPos.left + 1].val = C.CELL_STATES.EMPTY;
             }
         }
