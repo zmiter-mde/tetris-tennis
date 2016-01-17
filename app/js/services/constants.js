@@ -8,7 +8,7 @@
     function Constants() {
         var vm = this;
 
-        vm.INTERVAL = 500;
+        vm.INTERVAL = 200;
 
         vm.BALL_START = {
             TOP: 43,

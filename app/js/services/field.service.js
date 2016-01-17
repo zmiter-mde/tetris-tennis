@@ -14,11 +14,34 @@
         vm.init = init;
         vm.start = start;
         vm.stop = stop;
+        vm.moveCigaretteLeft = moveCigaretteLeft;
+        vm.moveCigaretteRight = moveCigaretteRight;
+
+        function moveCigaretteLeft() {
+            if (vm.cigarettePos > C.BORDERS.LEFT_BORDER) {
+                var field = vm.fieldModel.field, bottom = C.BORDERS.BOTTOM_BORDER;
+                field[bottom][vm.cigarettePos - 1].val = C.CELL_STATES.FILTER;
+                field[bottom][vm.cigarettePos + 1].val = C.CELL_STATES.PLATFORM;
+                field[bottom][vm.cigarettePos + 7].val = C.CELL_STATES.EMPTY;
+                --vm.cigarettePos;
+            }
+        }
+
+        function moveCigaretteRight() {
+            if (vm.cigarettePos + 7 < C.BORDERS.RIGHT_BORDER) {
+                var field = vm.fieldModel.field, bottom = C.BORDERS.BOTTOM_BORDER;
+                field[bottom][vm.cigarettePos].val = C.CELL_STATES.EMPTY;
+                field[bottom][vm.cigarettePos + 2].val = C.CELL_STATES.FILTER;
+                field[bottom][vm.cigarettePos + 8].val = C.CELL_STATES.PLATFORM;
+                ++vm.cigarettePos;
+            }
+        }
 
         function init() {
-            vm.direction = C.DIRECTIONS.TOP_RIGHT;
-            vm.ballPos = { top: C.BALL_START.TOP, left: C.BALL_START.LEFT };
-            vm.fieldModel.createField();
+            vm.direction = C.DIRECTIONS.TOP_RIGHT; // current ball direction
+            vm.cigarettePos = 21; // current cigarette position on the floor
+            vm.ballPos = { top: C.BALL_START.TOP, left: C.BALL_START.LEFT }; // current ball position from top left corner
+            vm.fieldModel.createField(); // field
             vm.intervalId = null;
             vm.interval = C.INTERVAL;
             vm.score = 0;
@@ -38,7 +61,7 @@
         }
 
         function move() {
-            console.log('moving');
+            console.log(vm.ballPos);
             switch (vm.direction) {
                 case C.DIRECTIONS.TOP_RIGHT:
                     moveTopRight();
@@ -62,18 +85,18 @@
             var field = vm.fieldModel.field;
             var pos = vm.ballPos;
             if (pos.top == C.BORDERS.TOP_BORDER || field[pos.top - 1][pos.left].val == C.CELL_STATES.CELL) {
-                deleteCells(C.DIRECTIONS.TOP_RIGHT, true);
                 if (pos.left == C.BORDERS.RIGHT_BORDER || field[pos.top][pos.left + 1].val == C.CELL_STATES.CELL) {
                     vm.direction = C.DIRECTIONS.BOTTOM_LEFT;
                 } else {
                     vm.direction = C.DIRECTIONS.BOTTOM_RIGHT;
                 }
+                deleteCells(C.DIRECTIONS.TOP_RIGHT, true);
             } else {
                 if (pos.left == C.BORDERS.RIGHT_BORDER || field[pos.top][pos.left + 1].val == C.CELL_STATES.CELL) {
                     deleteCells(C.DIRECTIONS.TOP_RIGHT, true);
                     vm.direction = C.DIRECTIONS.TOP_LEFT;
                 } else {
-                    if (field[pos.top - 1][pos.left + 1] == C.CELL_STATES.CELL) {
+                    if (field[pos.top - 1][pos.left + 1].val == C.CELL_STATES.CELL) {
                         deleteCells(C.DIRECTIONS.TOP_RIGHT, false);
                         vm.direction = C.DIRECTIONS.BOTTOM_LEFT;
                     } else {
@@ -87,18 +110,18 @@
             var field = vm.fieldModel.field;
             var pos = vm.ballPos;
             if (pos.top == C.BORDERS.TOP_BORDER || field[pos.top - 1][pos.left].val == C.CELL_STATES.CELL) {
-                deleteCells(C.DIRECTIONS.TOP_LEFT, true);
                 if (pos.left == C.BORDERS.LEFT_BORDER || field[pos.top][pos.left - 1].val == C.CELL_STATES.CELL) {
                     vm.direction = C.DIRECTIONS.BOTTOM_RIGHT;
                 } else {
                     vm.direction = C.DIRECTIONS.BOTTOM_LEFT;
                 }
+                deleteCells(C.DIRECTIONS.TOP_LEFT, true);
             } else {
                 if (pos.left == C.BORDERS.LEFT_BORDER || field[pos.top][pos.left - 1].val == C.CELL_STATES.CELL) {
                     deleteCells(C.DIRECTIONS.TOP_LEFT, true);
                     vm.direction = C.DIRECTIONS.TOP_RIGHT;
                 } else {
-                    if (field[pos.top - 1][pos.left - 1] == C.CELL_STATES.CELL) {
+                    if (field[pos.top - 1][pos.left - 1].val == C.CELL_STATES.CELL) {
                         deleteCells(C.DIRECTIONS.TOP_LEFT, false);
                         vm.direction = C.DIRECTIONS.BOTTOM_RIGHT;
                     } else {
@@ -111,19 +134,19 @@
         function moveBottomLeft() {
             var field = vm.fieldModel.field;
             var pos = vm.ballPos;
-            if (field[pos.top + 1][pos.left].val == C.CELL_STATES.CELL) {
-                deleteCells(C.DIRECTIONS.TOP_LEFT, true);
+            if (!isEmpty(field[pos.top + 1][pos.left].val)) {
                 if (pos.left == C.BORDERS.LEFT_BORDER || field[pos.top][pos.left - 1].val == C.CELL_STATES.CELL) {
                     vm.direction = C.DIRECTIONS.TOP_RIGHT;
                 } else {
                     vm.direction = C.DIRECTIONS.TOP_LEFT;
                 }
+                deleteCells(C.DIRECTIONS.BOTTOM_LEFT, true);
             } else {
                 if (pos.left == C.BORDERS.LEFT_BORDER || field[pos.top][pos.left - 1].val == C.CELL_STATES.CELL) {
                     deleteCells(C.DIRECTIONS.TOP_LEFT, true);
                     vm.direction = C.DIRECTIONS.BOTTOM_RIGHT;
                 } else {
-                    if (field[pos.top + 1][pos.left - 1] == C.CELL_STATES.CELL) {
+                    if (!isEmpty(field[pos.top + 1][pos.left - 1].val)) {
                         deleteCells(C.DIRECTIONS.BOTTOM_LEFT, false);
                         vm.direction = C.DIRECTIONS.TOP_RIGHT;
                     } else {
@@ -136,19 +159,19 @@
         function moveBottomRight() {
             var field = vm.fieldModel.field;
             var pos = vm.ballPos;
-            if (field[pos.top + 1][pos.left].val == C.CELL_STATES.CELL) {
-                deleteCells(C.DIRECTIONS.BOTTOM_RIGHT, true);
+            if (!isEmpty(field[pos.top + 1][pos.left].val)) {
                 if (pos.left == C.BORDERS.RIGHT_BORDER || field[pos.top][pos.left + 1].val == C.CELL_STATES.CELL) {
                     vm.direction = C.DIRECTIONS.TOP_LEFT;
                 } else {
                     vm.direction = C.DIRECTIONS.TOP_RIGHT;
                 }
+                deleteCells(C.DIRECTIONS.BOTTOM_RIGHT, true);
             } else {
                 if (pos.left == C.BORDERS.RIGHT_BORDER || field[pos.top][pos.left + 1].val == C.CELL_STATES.CELL) {
                     deleteCells(C.DIRECTIONS.BOTTOM_RIGHT, true);
                     vm.direction = C.DIRECTIONS.BOTTOM_LEFT;
                 } else {
-                    if (field[pos.top + 1][pos.left + 1] == C.CELL_STATES.CELL) {
+                    if (!isEmpty(field[pos.top + 1][pos.left + 1].val)) {
                         deleteCells(C.DIRECTIONS.BOTTOM_RIGHT, false);
                         vm.direction = C.DIRECTIONS.TOP_LEFT;
                     } else {
@@ -156,6 +179,10 @@
                     }
                 }
             }
+        }
+
+        function isEmpty(cellValue) {
+            return cellValue == C.CELL_STATES.EMPTY || cellValue == C.CELL_STATES.BROKEN;
         }
 
         function moveBall(direction) {
