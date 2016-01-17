@@ -16,7 +16,7 @@
     <script src="js/models/field.model.js"></script>
 </head>
 
-<body ng-controller="FieldCtrl as vm" ng-keypress="vm.changeDirection($event)" class="container">
+<body ng-controller="FieldCtrl as vm" ng-keydown="vm.changeDirection($event)" class="container">
     <div class="info">
         <div>
             Your score is <span>{{score}}</span><br/>
@@ -30,8 +30,8 @@
     </div>
 
     <table>
-        <tr ng-repeat="row in vm.field">
-            <td ng-repeat="cell in row" ng-switch="cell.val">
+        <tr ng-repeat="row in vm.field track by $index">
+            <td ng-repeat="cell in row track by $index" ng-switch="cell.val">
                 <div class="cell" ng-switch-when="1"></div>
                 <div class="broken" ng-switch-when="2"></div>
                 <div class="platform" ng-switch-when="3"></div>

@@ -35,7 +35,7 @@
             TOP_BORDER: 0,
             LEFT_BORDER: 0,
             BOTTOM_BORDER: 44,
-            RIGHT_BORDER: 50
+            RIGHT_BORDER: 49
         };
 
 

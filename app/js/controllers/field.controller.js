@@ -22,8 +22,14 @@
             fieldService.start();
         }
 
-        function changeDirection() {
-
+        function changeDirection($event) {
+            if ($event.keyCode === 65 || $event.keyCode === 37) {
+                fieldService.moveCigaretteLeft();
+            } else if ($event.keyCode === 68 || $event.keyCode === 39) {
+                fieldService.moveCigaretteRight();
+            } else {
+                console.log("Wrong key. Use w, a, s, d)");
+            }
         }
 
         function outputField() {
